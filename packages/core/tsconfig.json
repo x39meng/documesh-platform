@@ -1,0 +1,13 @@
+{
+  "extends": "@repo/tsconfig/base.json",
+  "compilerOptions": {
+    "lib": ["esnext"],
+    "baseUrl": ".",
+    "paths": {
+      "@repo/database/*": ["../database/*"],
+      "@repo/config/*": ["../config/src/*"],
+      "@repo/core/*": ["./src/*"],
+      "@/*": ["./src/*"]
+    }
+  }
+}

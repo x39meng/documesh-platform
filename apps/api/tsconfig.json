@@ -1,0 +1,14 @@
+{
+  "extends": "@repo/tsconfig/base.json",
+  "compilerOptions": {
+    "lib": ["esnext"],
+    "moduleResolution": "bundler",
+    "types": ["bun-types"],
+    "baseUrl": ".",
+    "paths": {
+      "@repo/core/*": ["../../packages/core/src/*"],
+      "@repo/config/*": ["../../packages/config/src/*"],
+      "@/*": ["./src/*"]
+    }
+  }
+}

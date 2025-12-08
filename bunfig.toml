@@ -1,0 +1,8 @@
+# Bun Configuration
+# See: https://bun.com/docs/pm/isolated-installs
+
+[install]
+# Use configVersion 0 to enable hoisted installs by default (npm/yarn-like)
+# This is required for Next.js 16 compatibility
+configVersion = 0
+linker = "hoisted"

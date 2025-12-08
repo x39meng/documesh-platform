@@ -1,0 +1,13 @@
+{
+  "extends": "@repo/tsconfig/base.json",
+  "compilerOptions": {
+    "lib": ["esnext"],
+    "types": ["bun-types"],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./*"]
+    }
+  },
+  "include": ["**/*.ts"],
+  "exclude": ["node_modules"]
+}

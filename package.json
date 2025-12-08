@@ -1,0 +1,48 @@
+{
+  "name": "documesh-platform",
+  "private": true,
+  "packageManager": "bun@1.3.3",
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "// --- Environment & Database ---": "",
+    "sync:local": "./infrastructure/scripts/sync-env-local.sh",
+    "sync:remote": "./infrastructure/scripts/sync-env-remote.sh",
+    "db:push": "bun run --filter @repo/database push",
+    "db:studio": "bun run --filter @repo/database studio",
+    "db:reset": "dotenv -e .env -- bun run --filter @repo/database db:reset",
+    "db:seed": "dotenv -e .env -- bun run --filter @repo/database db:seed",
+    "db:seed-user": "dotenv -e .env -- bun run --filter @repo/database db:seed-user",
+    "s3:setup": "dotenv -e .env -- bun packages/core/scripts/setup-local-s3.ts",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "// --- Shortcuts for Remote Dev ---": "",
+    "dev:dev": "dotenv -e .env -e apps/web/.env.dev -- turbo run dev",
+    "dev:staging": "dotenv -e .env -e apps/web/.env.staging -- turbo run dev",
+    "// --- Versioning ---": "",
+    "changeset": "changeset",
+    "version-packages": "changeset version"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^8.48.0",
+    "@typescript-eslint/parser": "^8.48.0",
+    "dotenv-cli": "^11.0.0",
+    "drizzle-orm": "^0.44.7",
+    "eslint": "^9.39.1",
+    "eslint-config-prettier": "^10.1.8",
+    "pino-pretty": "^13.1.3",
+    "playwright": "^1.57.0",
+    "postgres": "^3.4.7",
+    "prettier": "^3.0.0",
+    "turbo": "^2.6.1",
+    "typescript": "^5.0.0"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "dependencies": {
+    "dotenv": "^17.2.3"
+  }
+}
