@@ -1,54 +1,70 @@
+
 "use client";
 
-import { useState, useEffect } from "react";
-import { getSubmissions, getSubmission } from "@/actions/ingest";
+import { useEffect, useState, useRef } from "react";
+import { getSubmissions, getSubmission, getFileUrl } from "@/actions/ingest";
 import { type PublicSubmission } from "@/lib/types";
+import { cn } from "@repo/ui/utils";
+import { Button } from "@repo/ui/components/button";
+import { ScrollArea } from "@repo/ui/components/scroll-area";
 import {
   FileText,
   Clock,
   CheckCircle,
+  AlertCircle,
   XCircle,
   Loader2,
   Upload,
+  Search,
+  ExternalLink
 } from "lucide-react";
-import Dropzone from "@/components/upload/dropzone";
-
-import { DashboardShell } from "@repo/ui/layouts/dashboard-shell";
-import { Button } from "@repo/ui/components/button";
-import { cn } from "@repo/ui/utils";
+import { UploadDialog } from "@/components/upload-dialog";
+import { SplitView } from "@/components/document/split-view";
+import { ResumeViewer } from "@/components/document/resume-viewer";
+import { SelectionProvider } from "@/context/selection-context";
+import { extractBBoxes } from "@/lib/data-helpers";
 
 export default function DashboardPage() {
   const [submissions, setSubmissions] = useState<PublicSubmission[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [detail, setDetail] = useState<PublicSubmission | null>(null);
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [showUpload, setShowUpload] = useState(false);
+  
+  // Track the file key of the currently loaded PDF to prevent unnecessary refetches
+  // and ensure we fetch when the document changes (even if pdfUrl state is stale in closure)
+  const currentPdfKeyRef = useRef<string | null>(null);
 
+  // Initial load
   useEffect(() => {
     loadSubmissions();
   }, []);
 
+  // Detail loading when selection changes
   useEffect(() => {
     if (selectedId) {
+      // Clear previous PDF state immediately to show loading spinner
+      setPdfUrl(null);
+      currentPdfKeyRef.current = null; 
       loadDetail(selectedId);
+    } else {
+      setDetail(null);
+      setPdfUrl(null);
+      currentPdfKeyRef.current = null;
     }
   }, [selectedId]);
 
-  // Poll for updates
+  // Polling for updates
   useEffect(() => {
     const interval = setInterval(() => {
       loadSubmissions(true);
-      if (selectedId) {
-        // We always poll the detail if selected, to catch status changes
-        // We could optimize to only poll if pending/processing, but checking the fresh data is safer
-        // and allows catching "failed" -> "completed" if we ever support retries, etc.
-        // But primarily we care about pending/processing -> completed/failed.
+      if (selectedId && detail?.status !== "completed") {
         loadDetail(selectedId);
       }
     }, 2000);
 
     return () => clearInterval(interval);
-  }, [selectedId]);
+  }, [selectedId, detail?.status]);
 
   async function loadSubmissions(silent = false) {
     if (!silent) setLoading(true);
@@ -56,7 +72,7 @@ export default function DashboardPage() {
       const data = await getSubmissions();
       setSubmissions(data);
     } catch (error) {
-      console.error("Failed to load submissions:", error);
+      console.error(error);
     } finally {
       if (!silent) setLoading(false);
     }
@@ -64,197 +80,194 @@ export default function DashboardPage() {
 
   async function loadDetail(id: string) {
     try {
-      const data = await getSubmission(id);
-      // Only update if data changed to avoid unnecessary re-renders if we were using memoized components
-      // But here simple setDetail is fine
-      setDetail(data);
+        const data = await getSubmission(id);
+        if (data) {
+            setDetail(data);
+            
+            // Only fetch PDF URL if we have a key AND it differs from what's currently loaded
+            if (data.fileKey && data.fileKey !== currentPdfKeyRef.current) {
+                const url = await getFileUrl(data.fileKey);
+                setPdfUrl(url);
+                currentPdfKeyRef.current = data.fileKey;
+            }
+        }
     } catch (error) {
-      console.error("Failed to load submission detail:", error);
+        console.error("Failed to load detail", error);
     }
   }
 
-  function getStatusIcon(status: string) {
+  const getStatusIcon = (status: string) => {
     switch (status) {
-      case "completed":
-        return (
-          <CheckCircle className="w-5 h-5 text-green-500 dark:text-green-400" />
-        );
-      case "failed":
-        return <XCircle className="w-5 h-5 text-destructive" />;
-      case "pending":
-      case "processing":
-        return <Loader2 className="w-5 h-5 text-primary animate-spin" />;
-      default:
-        return <Clock className="w-5 h-5 text-muted-foreground" />;
+      case "completed": return <CheckCircle className="w-4 h-4 text-green-500" />;
+      case "failed": return <XCircle className="w-4 h-4 text-destructive" />;
+      case "processing": return <Loader2 className="w-4 h-4 text-blue-500 animate-spin" />;
+      default: return <Clock className="w-4 h-4 text-muted-foreground" />;
     }
-  }
+  };
 
   return (
-    <DashboardShell>
-      <div className="flex items-center justify-between mb-8">
-        <div className="flex items-center gap-3">
-          <FileText className="w-8 h-8 text-primary" />
-          <h1 className="text-3xl font-bold text-foreground">
-            Document Dashboard
-          </h1>
+    <SelectionProvider>
+      <div className="flex h-screen bg-background overflow-hidden">
+        {/* Sidebar */}
+        <div className="w-80 border-r border-border bg-card flex flex-col shrink-0 z-20 shadow-xl">
+            {/* Header */}
+            <div className="p-4 border-b border-border flex items-center justify-between bg-card/50 backdrop-blur-sm">
+                <span className="font-bold text-lg tracking-tight">Documesh</span>
+                <UploadDialog
+                    trigger={
+                        <Button size="icon" variant="ghost" className="rounded-full hover:bg-primary/10 hover:text-primary">
+                            <Upload className="w-4 h-4" />
+                        </Button>
+                    }
+                    onSuccess={(id) => {
+                        loadSubmissions();
+                        setSelectedId(id);
+                    }}
+                />
+            </div>
+            
+            {/* Search */}
+            <div className="p-4 pt-2">
+                <div className="relative group">
+                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                    <input 
+                        className="w-full bg-secondary/30 border border-transparent rounded-lg pl-9 pr-4 py-2 text-sm focus:bg-background focus:border-primary/20 focus:ring-2 focus:ring-primary/10 outline-none transition-all placeholder:text-muted-foreground/50"
+                        placeholder="Search documents..." 
+                    />
+                </div>
+            </div>
+
+            {/* List */}
+            <ScrollArea className="flex-1">
+                <div className="px-2 pb-4 space-y-1">
+                    {submissions.map((sub) => (
+                        <button
+                            key={sub.id}
+                            onClick={() => setSelectedId(sub.id)}
+                            className={cn(
+                                "w-full text-left px-3 py-3 rounded-lg transition-all text-sm group border border-transparent",
+                                selectedId === sub.id 
+                                    ? "bg-primary/5 border-primary/20 shadow-sm" 
+                                    : "hover:bg-secondary/50 hover:border-border/50"
+                            )}
+                        >
+                            <div className="flex justify-between items-start mb-1">
+                                <span className={cn("font-medium truncate transition-colors", selectedId === sub.id ? "text-primary" : "text-foreground")}>
+                                    {sub.documentType}
+                                </span>
+                                <span className="text-[10px] text-muted-foreground whitespace-nowrap pt-0.5 opacity-70">
+                                    {new Date(sub.createdAt).toLocaleDateString()}
+                                </span>
+                            </div>
+                            <div className="flex items-center gap-1.5 text-xs text-muted-foreground/80">
+                                {getStatusIcon(sub.status)}
+                                <span className="capitalize">{sub.status}</span>
+                            </div>
+                        </button>
+                    ))}
+                    {submissions.length === 0 && !loading && (
+                        <div className="text-center py-8 text-xs text-muted-foreground flex flex-col items-center gap-2">
+                            <FileText className="w-8 h-8 opacity-20" />
+                            <span>No documents found</span>
+                        </div>
+                    )}
+                </div>
+            </ScrollArea>
         </div>
-        <div className="flex items-center gap-3">
-          <Button
-            onClick={() => setShowUpload(!showUpload)}
-            variant={showUpload ? "secondary" : "default"}
-          >
-            {showUpload ? (
-              "Cancel"
+
+        {/* Main Workspace */}
+        <div className="flex-1 flex flex-col bg-background h-full overflow-hidden relative">
+            {!selectedId ? (
+                <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground p-8 animate-in fade-in zoom-in-95 duration-500">
+                     <div className="w-20 h-20 rounded-3xl bg-secondary/50 mb-6 flex items-center justify-center shadow-inner">
+                        <FileText className="w-10 h-10 opacity-30" />
+                     </div>
+                     <p className="text-lg font-medium text-foreground/80">Select a document to view details</p>
+                     <p className="text-sm opacity-50">Choose from the list on the left or upload a new PDF.</p>
+                </div>
+            ) : !detail || !pdfUrl ? (
+                <div className="flex-1 flex items-center justify-center">
+                    <Loader2 className="w-8 h-8 text-primary animate-spin" />
+                </div>
             ) : (
-              <>
-                <Upload className="w-4 h-4 mr-2" />
-                Upload PDF
-              </>
+                <SplitView pdfUrl={pdfUrl} allBBoxes={detail.finalData ? extractBBoxes(detail.finalData) : undefined}>
+                     <div className="min-h-full flex flex-col">
+                        {/* Toolbar */}
+                        <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-md border-b border-border p-4 flex justify-between items-center shrink-0">
+                             <div className="flex items-center gap-3">
+                                <h2 className="font-bold text-lg">{detail.documentType}</h2>
+                                <span className={cn("px-2.5 py-0.5 rounded-full text-xs font-semibold uppercase tracking-wider",
+                                    detail.status === "completed" ? "bg-green-500/10 text-green-600" :
+                                    detail.status === "failed" ? "bg-red-500/10 text-red-600" :
+                                    "bg-blue-500/10 text-blue-600"
+                                )}>
+                                    {detail.status}
+                                </span>
+                             </div>
+                             
+                             <div className="flex items-center gap-2">
+                                <Button variant="outline" size="sm" className="h-8 gap-2" asChild>
+                                    <a href={pdfUrl} target="_blank" rel="noreferrer">
+                                        <ExternalLink className="w-3 h-3" />
+                                        <span>Raw PDF</span>
+                                    </a>
+                                </Button>
+                             </div>
+                        </div>
+
+                        {/* Content */}
+                        <div className="flex-1">
+                            {detail.status === 'processing' && (
+                                <div className="p-20 text-center space-y-6">
+                                    <div className="relative mx-auto w-16 h-16">
+                                        <div className="absolute inset-0 rounded-full border-4 border-primary/20"></div>
+                                        <div className="absolute inset-0 rounded-full border-4 border-primary border-t-transparent animate-spin"></div>
+                                    </div>
+                                    <div className="space-y-1">
+                                        <p className="font-medium text-foreground">Analyzing Document</p>
+                                        <p className="text-sm text-muted-foreground">Extracting structured data from PDF...</p>
+                                    </div>
+                                </div>
+                            )}
+
+                            {detail.status === 'completed' && detail.hasData && (
+                                detail.documentType === 'RESUME' ? (
+                                    <ResumeViewer data={detail.finalData} />
+                                ) : (
+                                    <div className="p-6">
+                                        <div className="bg-zinc-950 rounded-lg overflow-hidden border border-border shadow-sm">
+                                            <div className="px-4 py-2 bg-zinc-900 border-b border-zinc-800 text-xs text-zinc-400 font-mono">
+                                                JSON Output
+                                            </div>
+                                            <pre className="p-4 text-xs text-zinc-300 font-mono overflow-auto max-h-[600px] scrollbar-thin scrollbar-thumb-zinc-700">
+                                                {JSON.stringify(detail.finalData, null, 2)}
+                                            </pre>
+                                        </div>
+                                    </div>
+                                )
+                            )}
+                            
+                            {detail.status === 'failed' && (
+                                <div className="p-12">
+                                    <div className="bg-destructive/5 border border-destructive/20 rounded-xl p-6 flex flex-col items-center text-center gap-4">
+                                        <div className="p-3 bg-destructive/10 rounded-full">
+                                            <AlertCircle className="w-8 h-8 text-destructive" />
+                                        </div>
+                                        <div>
+                                            <h3 className="font-semibold text-destructive">Extraction Failed</h3>
+                                            <p className="text-sm text-destructive/80 mt-1">
+                                                We encountered an error processing this document. Please verify the PDF file is not corrupted and try again.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                     </div>
+                </SplitView>
             )}
-          </Button>
-          <Button
-            variant="destructive"
-            onClick={async () => {
-              await import("@/lib/auth-client").then((m) =>
-                m.authClient.signOut()
-              );
-              window.location.href = "/login";
-            }}
-          >
-            Sign Out
-          </Button>
         </div>
       </div>
-
-      {showUpload && (
-        <div className="mb-8">
-          <Dropzone
-            onUploadSuccess={(id) => {
-              setShowUpload(false);
-              loadSubmissions();
-              setSelectedId(id);
-            }}
-          />
-        </div>
-      )}
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Submissions List */}
-        <div className="bg-card rounded-xl p-6 border border-border shadow-sm">
-          <h2 className="text-xl font-semibold text-foreground mb-4">
-            Recent Submissions
-          </h2>
-
-          {loading ? (
-            <div className="flex items-center justify-center py-12">
-              <Loader2 className="w-8 h-8 text-primary animate-spin" />
-            </div>
-          ) : submissions.length === 0 ? (
-            <div className="text-center py-12 text-muted-foreground">
-              <FileText className="w-12 h-12 mx-auto mb-3 opacity-50" />
-              <p>No submissions yet</p>
-              <p className="text-sm mt-1">Upload a document to get started</p>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {submissions.map((sub) => (
-                <button
-                  key={sub.id}
-                  onClick={() => setSelectedId(sub.id)}
-                  className={cn(
-                    "w-full text-left p-4 rounded-lg transition-all border",
-                    selectedId === sub.id
-                      ? "bg-accent border-primary/50"
-                      : "bg-background border-border hover:bg-accent/50"
-                  )}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      {getStatusIcon(sub.status)}
-                      <div>
-                        <p className="text-foreground font-medium">
-                          {sub.documentType}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          {new Date(sub.createdAt).toLocaleString()}
-                        </p>
-                      </div>
-                    </div>
-                    <span
-                      className={cn(
-                        "px-3 py-1 rounded-full text-xs font-medium",
-                        sub.status === "completed"
-                          ? "bg-green-500/10 text-green-600 dark:text-green-400"
-                          : sub.status === "failed"
-                            ? "bg-destructive/10 text-destructive"
-                            : "bg-blue-500/10 text-blue-600 dark:text-blue-400"
-                      )}
-                    >
-                      {sub.status}
-                    </span>
-                  </div>
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Detail View */}
-        <div className="bg-card rounded-xl p-6 border border-border shadow-sm">
-          <h2 className="text-xl font-semibold text-foreground mb-4">
-            Extraction Results
-          </h2>
-
-          {!selectedId ? (
-            <div className="text-center py-12 text-muted-foreground">
-              <p>Select a submission to view details</p>
-            </div>
-          ) : !detail ? (
-            <div className="flex items-center justify-center py-12">
-              <Loader2 className="w-8 h-8 text-primary animate-spin" />
-            </div>
-          ) : (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between pb-4 border-b border-border">
-                <span className="text-muted-foreground">Status</span>
-                <div className="flex items-center gap-2">
-                  {getStatusIcon(detail.status)}
-                  <span className="text-foreground font-medium capitalize">
-                    {detail.status}
-                  </span>
-                </div>
-              </div>
-
-              {detail.finalData && (
-                <div className="mt-4">
-                  <h3 className="text-foreground font-medium mb-3">
-                    Extracted Data
-                  </h3>
-                  <div className="bg-muted rounded-lg p-4 max-h-96 overflow-y-auto">
-                    <pre className="text-sm text-muted-foreground whitespace-pre-wrap">
-                      {JSON.stringify(detail.finalData, null, 2)}
-                    </pre>
-                  </div>
-                </div>
-              )}
-
-              {!detail.finalData && detail.status === "pending" && (
-                <div className="text-center py-8 text-muted-foreground">
-                  <Loader2 className="w-8 h-8 mx-auto mb-3 animate-spin" />
-                  <p>Processing document...</p>
-                </div>
-              )}
-
-              {!detail.finalData && detail.status === "failed" && (
-                <div className="text-center py-8 text-destructive">
-                  <XCircle className="w-8 h-8 mx-auto mb-3" />
-                  <p>Extraction failed</p>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      </div>
-    </DashboardShell>
+    </SelectionProvider>
   );
 }

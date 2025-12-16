@@ -1,7 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: "standalone",
-  transpilePackages: ["@repo/core", "@repo/database", "@repo/ui", "@repo/config"],
+  serverExternalPackages: ["pino", "thread-stream"],
 };
 
 module.exports = nextConfig;

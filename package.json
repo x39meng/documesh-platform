@@ -25,6 +25,7 @@
     "version-packages": "changeset version"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.29.8",
     "@typescript-eslint/eslint-plugin": "^8.48.0",
     "@typescript-eslint/parser": "^8.48.0",
     "dotenv-cli": "^11.0.0",

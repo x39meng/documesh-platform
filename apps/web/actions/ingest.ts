@@ -1,6 +1,6 @@
 "use server";
 
-import { getUploadUrl } from "@repo/core";
+import { getUploadUrl, getDownloadUrl } from "@repo/core";
 import { InsertSubmissionSchema } from "@repo/database";
 import { SubmissionService } from "@repo/core/services/submission.service";
 import { documentQueue } from "@/lib/queue";
@@ -15,6 +15,13 @@ export async function initiateUpload(filename: string) {
   const { url, key } = await getUploadUrl(orgId, filename);
 
   return { url, key };
+}
+
+/**
+ * Get a presigned download URL for a file
+ */
+export async function getFileUrl(key: string) {
+  return getDownloadUrl(key);
 }
 
 /**

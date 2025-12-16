@@ -24,9 +24,11 @@ VISUAL ANALYSIS TASKS:
 1. Look for a profile picture. Set 'visualMetaAnalysis.hasHeadshot' accordingly.
 2. Analyze the layout. Is it a dense academic CV or a modern 2-column design?
 EXTRACTION TASKS:
-1. Extract candidate details (name, email, etc.), work experience, and education.
+1. Extract candidate details, work experience, and education.
 2. Normalize all dates to "YYYY-MM" format.
-3. Infer skills based on job descriptions. 
+3. Infer skills based on job descriptions.
+4. COORDINATES: All BBoxes must be [x1, y1, x2, y2] (0-1000). x1 is the left edge.
+5. EDUCATION: Split "Bachelor of Science in CS" -> Degree="Bachelor of Science", Field="CS".
 Extract the data matching the schema.`,
     },
   },

@@ -8,8 +8,8 @@ export const ResumeSchema = z.object({
   fullName: z.string().describe("Full name of the candidate"),
   nameBbox: z
     .array(z.number())
-    .optional()
-    .describe("Bounding box coordinates for the name [x1, y1, x2, y2]"),
+
+    .describe("Box [x1, y1, x2, y2] (0-1000). x1=left, y1=top."),
   headline: z
     .string()
     .optional()
@@ -60,6 +60,10 @@ export const ResumeSchema = z.object({
           .array(z.string())
           .optional()
           .describe("Technologies and tools used"),
+        bbox: z
+          .array(z.number())
+          .optional()
+          .describe("Box [x1, y1, x2, y2] (0-1000)."),
       })
     )
     .optional()
@@ -68,15 +72,24 @@ export const ResumeSchema = z.object({
   education: z
     .array(
       z.object({
-        institution: z
+        institution: z.string().optional().describe("University name"),
+        degree: z
           .string()
           .optional()
-          .describe("Educational institution name"),
-        degree: z.string().optional().describe("Degree obtained"),
-        fieldOfStudy: z.string().optional().describe("Field of study or major"),
+          .describe("Degree Only (e.g. 'Bachelor of Science', 'B.A.')"),
+        fieldOfStudy: z
+          .string()
+          .optional()
+          .describe("Major/Subject Only (e.g. 'Computer Science')"),
         startDate: z.string().optional().nullable().describe(DATE_DESC),
         endDate: z.string().optional().nullable().describe(DATE_DESC),
         gpa: z.string().optional().describe("GPA if mentioned"),
+        bbox: z
+          .array(z.number())
+          .optional()
+          .describe(
+            "Bounding box [x1, y1, x2, y2] normalized to 1000. Covers the entire section."
+          ),
       })
     )
     .optional()

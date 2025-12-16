@@ -22,9 +22,10 @@
 
 Use these workflows to perform complex tasks reliably.
 
-| Task           | Workflow File                                                                           | Description                                |
-| :------------- | :-------------------------------------------------------------------------------------- | :----------------------------------------- |
-| **Inspect DB** | [`docs/agent_workflows/inspect-local-data.md`](./agent_workflows/inspect-local-data.md) | Check local DB state & recent submissions. |
+| Task           | Workflow File                                                                                 | Description                                |
+| :------------- | :-------------------------------------------------------------------------------------------- | :----------------------------------------- |
+| **Inspect DB** | [`docs/agent_workflows/inspect-local-data.md`](./agent_workflows/inspect-local-data.md)       | Check local DB state & recent submissions. |
+| **Validate**   | [`docs/agent_workflows/local-auth-validation.md`](./agent_workflows/local-auth-validation.md) | Sign in & validate features end-to-end.    |
 
 ---
 
@@ -85,6 +86,8 @@ When implementing a feature, follow this **Execution Order**:
 2.  **Create Access:** Update `packages/core/repositories`.
 3.  **Build Logic:** Update `packages/core/services`.
 4.  **Connect UI:** Update `apps/web` (Server Actions -> UI).
+5.  **Verify & Test:** Validate by signing in (use standard credentials) and testing the User Flow end-to-end. NOT OPTIONAL.
+6.  **Log History:** Document changes in `tmp/agent_history/YYYY_MM_DD_<chat_name>.md` using Conventional Commits. Use a **SINGLE** file for the entire conversation session; append new entries to it rather than creating separate files.
 
 ---
 

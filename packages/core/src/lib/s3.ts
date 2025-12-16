@@ -31,6 +31,14 @@ export async function getUploadUrl(orgId: string, filename: string) {
   return { url, key };
 }
 
+export async function getDownloadUrl(key: string) {
+  const command = new GetObjectCommand({
+    Bucket: BUCKET_NAME,
+    Key: key,
+  });
+  return getSignedUrl(s3Client, command, { expiresIn: 3600 });
+}
+
 export async function checkFileExists(key: string) {
   try {
     const command = new HeadObjectCommand({

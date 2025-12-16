@@ -4,84 +4,97 @@
 
 @layer base {
   :root {
-    /* Pure White Background, High Contrast Text */
+    /* Pure White Background */
     --background: 0 0% 100%;
+    /* Zinc-950 for high contrast text */
     --foreground: 240 10% 3.9%;
 
-    /* Subtle Cards (Not pure white, slightly distinct) */
+    /* Card: White with subtle border integration */
     --card: 0 0% 100%;
     --card-foreground: 240 10% 3.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 240 10% 3.9%;
 
-    /* Primary: Deep Black (Professional) */
-    --primary: 240 5.9% 10%;
+    /* Primary: Indigo-600 - Vibrant but professional */
+    --primary: 226 70% 55.5%;
     --primary-foreground: 0 0% 98%;
 
-    /* Secondary: Subtle Gray */
+    /* Secondary: Zinc-100 */
     --secondary: 240 4.8% 95.9%;
     --secondary-foreground: 240 5.9% 10%;
 
-    /* Muted: For helper text */
+    /* Muted: Zinc-100 */
     --muted: 240 4.8% 95.9%;
+    /* Zinc-500 for subdued text */
     --muted-foreground: 240 3.8% 46.1%;
 
-    /* Accent: For hover states (Ghost buttons) */
+    /* Accent: Zinc-100 for hovers */
     --accent: 240 4.8% 95.9%;
     --accent-foreground: 240 5.9% 10%;
 
-    /* Destructive: Professional Red */
+    /* Destructive: Red-600 */
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
 
-    /* Border & Input: Subtle lines */
+    /* Border: Zinc-200 */
     --border: 240 5.9% 90%;
+    /* Input: Zinc-200 */
     --input: 240 5.9% 90%;
-    --ring: 240 5.9% 10%;
+    /* Ring: Indigo-600 */
+    --ring: 226 70% 55.5%;
 
-    /* Border Radius: '0.5rem' is the sweet spot for modern look */
     --radius: 0.5rem;
 
-    /* Semantic Status Colors */
-    --success: 142.1 76.2% 36.3%;
-    --success-foreground: 355.7 100% 97.3%;
+    /* Semantic Status - Adjusted for vibrancy */
+    --success: 142 76% 36%;
+    --success-foreground: 355 100% 98%;
     
     --warning: 38 92% 50%;
     --warning-foreground: 48 96% 89%;
   }
 
   .dark {
-    /* Dark Mode: Deep Zinc, not pure black */
+    /* Dark Mode: Zinc-950 - Rich, deep dark */
     --background: 240 10% 3.9%;
     --foreground: 0 0% 98%;
 
-    --card: 240 10% 3.9%;
+    /* Card: Zinc-900 */
+    --card: 240 10% 9%;
     --card-foreground: 0 0% 98%;
     
-    --popover: 240 10% 3.9%;
+    --popover: 240 10% 9%;
     --popover-foreground: 0 0% 98%;
 
-    --primary: 0 0% 98%;
+    /* Primary: Indigo-500 for dark mode accessibility */
+    --primary: 226 70% 65%;
     --primary-foreground: 240 5.9% 10%;
 
+    /* Secondary: Zinc-800 */
     --secondary: 240 3.7% 15.9%;
     --secondary-foreground: 0 0% 98%;
 
+    /* Muted: Zinc-800 */
     --muted: 240 3.7% 15.9%;
+    /* Zinc-400 */
     --muted-foreground: 240 5% 64.9%;
 
+    /* Accent: Zinc-800 */
     --accent: 240 3.7% 15.9%;
     --accent-foreground: 0 0% 98%;
 
+    /* Destructive: Red-900 background for less jar */
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
 
+    /* Border: Zinc-800 */
     --border: 240 3.7% 15.9%;
+    /* Input: Zinc-800 */
     --input: 240 3.7% 15.9%;
-    --ring: 240 4.9% 83.9%;
+    /* Ring: Indigo-500 */
+    --ring: 226 70% 65%;
 
-    --success: 142.1 70.6% 45.3%;
-    --success-foreground: 144.9 80.4% 10%;
+    --success: 142 70% 50%;
+    --success-foreground: 144 80% 10%;
 
     --warning: 48 96% 89%;
     --warning-foreground: 38 92% 50%;

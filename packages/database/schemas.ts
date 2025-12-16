@@ -35,10 +35,4 @@ export const InsertMembershipSchema = createInsertSchema(schema.memberships);
 
 // Submissions (critical for document processing)
 export const SelectSubmissionSchema = createSelectSchema(schema.submissions);
-export const InsertSubmissionSchema = createInsertSchema(schema.submissions, {
-  // Add runtime validation on top of types
-  documentType: (schema) => schema.documentType.min(1),
-  pipelineVersion: (schema) => schema.pipelineVersion.min(1),
-  fileKey: (schema) => schema.fileKey.min(1),
-  status: (schema) => schema.status,
-});
+export const InsertSubmissionSchema = createInsertSchema(schema.submissions);

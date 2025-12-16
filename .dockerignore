@@ -57,3 +57,6 @@ localstack/
 # Sample Documents
 packages/documents/samples/*
 !packages/documents/samples/.gitkeep
+
+# Temporary Files
+tmp/
