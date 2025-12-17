@@ -31,6 +31,10 @@ const serverSchema = z.object({
   GEMINI_API_KEY: z.string().min(1),
   AWS_REGION: z.string().default("us-east-1"),
 
+  // Authentication
+  BETTER_AUTH_SECRET: z.string().min(1),
+  BETTER_AUTH_URL: z.string().url(),
+
   // Optional AWS Keys (Required only for LocalStack/Local Dev)
   AWS_ACCESS_KEY_ID: z.string().optional(),
   AWS_SECRET_ACCESS_KEY: z.string().optional(),
@@ -44,8 +48,9 @@ const serverSchema = z.object({
  * Exposed to the browser. MUST start with NEXT_PUBLIC_.
  */
 const clientSchema = z.object({
-  NEXT_PUBLIC_APP_URL: z.url(), // e.g. http://localhost:3000
-  NEXT_PUBLIC_API_URL: z.url(), // e.g. http://localhost:3001
+  NEXT_PUBLIC_APP_URL: z.string().url(), // e.g. http://localhost:3000
+  NEXT_PUBLIC_API_URL: z.string().url(), // e.g. http://localhost:3001
+  NEXT_PUBLIC_AUTH_URL: z.string().url(), // e.g. http://localhost:3000 (Web) or http://localhost:3002 (Admin)
 });
 
 /**
@@ -68,8 +73,12 @@ const runtimeEnv = {
   AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY,
   S3_BUCKET_NAME: process.env.S3_BUCKET_NAME,
 
+  BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET,
+  BETTER_AUTH_URL: process.env.BETTER_AUTH_URL,
+
   NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
   NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
+  NEXT_PUBLIC_AUTH_URL: process.env.NEXT_PUBLIC_AUTH_URL,
 };
 
 /**

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { authClient } from "@/lib/auth-client";
+import { authClient } from "@repo/ui/auth";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 

@@ -10,7 +10,10 @@
     "./layouts/dashboard-shell": "./src/layouts/dashboard-shell.tsx",
     "./components/badge": "./src/components/badge.tsx",
     "./components/card": "./src/components/card.tsx",
-    "./components/scroll-area": "./src/components/scroll-area.tsx"
+    "./components/table": "./src/components/table.tsx",
+    "./components/scroll-area": "./src/components/scroll-area.tsx",
+    "./components/sonner": "./src/components/sonner.tsx",
+    "./auth": "./src/lib/auth.ts"
   },
   "scripts": {
     "lint": "eslint . --ext .ts,.tsx"
@@ -27,6 +30,7 @@
     "typescript": "^5.4.5"
   },
   "dependencies": {
+    "better-auth": "^1.1.9",
     "@radix-ui/react-scroll-area": "^1.2.10",
     "@radix-ui/react-slot": "^1.0.2",
     "class-variance-authority": "^0.7.0",
@@ -36,6 +40,7 @@
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "tailwind-merge": "^3.4.0",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "sonner": "^1.7.1"
   }
 }
