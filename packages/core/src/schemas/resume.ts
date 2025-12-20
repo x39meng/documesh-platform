@@ -13,7 +13,7 @@ export const ResumeSchema = z.object({
   headline: z
     .string()
     .optional()
-    .describe("Professional title or headline if present"),
+    .describe("Professional title or headline. Should be at most 2 sentences. Rephrase if too long. If missing, write one."),
   contactEmail: z.string().email().optional().describe("Email address"),
   phoneNumber: z.string().optional().describe("Phone number"),
   location: z
