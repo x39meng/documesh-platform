@@ -19,7 +19,10 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "@repo/core/*": ["../../packages/core/src/*"],
+      "@repo/database/*": ["../../packages/database/*"],
+      "@repo/config/*": ["../../packages/config/src/*"]
     }
   },
   "include": [

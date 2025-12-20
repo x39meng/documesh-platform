@@ -8,12 +8,17 @@ interface SubmitButtonProps extends ButtonProps {
   loadingText?: string;
 }
 
-export function SubmitButton({ children, loadingText, disabled, ...props }: SubmitButtonProps) {
+export function SubmitButton({
+  children,
+  loadingText,
+  disabled,
+  ...props
+}: SubmitButtonProps) {
   const { pending } = useFormStatus();
 
   return (
     <Button disabled={pending || disabled} {...props}>
-      {children}
+      {pending && loadingText ? loadingText : children}
     </Button>
   );
 }

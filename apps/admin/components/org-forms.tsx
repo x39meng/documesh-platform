@@ -14,7 +14,7 @@ export function RotateKeyForm({ orgId }: RotateKeyFormProps) {
     try {
       await rotateApiKey(orgId);
       toast.success("API Key rotated successfully");
-    } catch (error) {
+    } catch {
       toast.error("Failed to rotate API key");
     }
   };
@@ -74,7 +74,7 @@ export function UpdateIpsForm({ orgId, initialIps }: UpdateIpsFormProps) {
 
       await updateAllowedIps(orgId, lines);
       toast.success("IP Allowlist updated successfully");
-    } catch (error) {
+    } catch {
       toast.error("Failed to update IP Allowlist");
     }
   };

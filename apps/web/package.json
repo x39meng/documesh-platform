@@ -6,7 +6,7 @@
     "dev": "next dev --port 3000",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint . --ext .ts,.tsx"
+    "lint": "tsc --noEmit && eslint . --ext .ts,.tsx"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.940.0",
@@ -15,6 +15,7 @@
     "@repo/core": "workspace:*",
     "@repo/database": "workspace:*",
     "@repo/ui": "workspace:*",
+    "ai": "^5.0.115",
     "better-auth": "^1.4.3",
     "bullmq": "^5.65.0",
     "clsx": "^2.1.1",
@@ -24,7 +25,11 @@
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-dropzone": "^14.0.0",
+    "react-markdown": "^10.1.0",
     "react-pdf": "^10.2.0",
+    "rehype-highlight": "^7.0.2",
+    "rehype-raw": "^7.0.0",
+    "remark-gfm": "^4.0.1",
     "tailwind-merge": "^3.4.0",
     "tailwindcss-animate": "^1.0.7",
     "zod": "^4.2.1"
