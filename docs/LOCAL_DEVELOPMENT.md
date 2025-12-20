@@ -31,7 +31,7 @@ This guide provides instructions on how to run, access, and test the DocuMesh Pl
 
 4.  **Setup S3 (LocalStack)**:
 
-    The S3 bucket (`documesh-local`) and CORS configuration are automatically applied when the container starts via `infrastructure/localstack/init-s3.sh`.
+    The S3 bucket (`documesh-local`) and CORS configuration are automatically applied when the container starts via `infrastructure/localstack/init-s3.sh`. Data is persisted in the `localstack_data` Docker volume.
 
     If you need to manually re-apply the configuration (e.g., after clearing volumes without restarting containers):
 

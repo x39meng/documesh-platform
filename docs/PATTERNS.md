@@ -144,3 +144,67 @@ We use the Service pattern to encapsulate business logic.
 
 - **Location:** `packages/core/src/services/*.service.ts`
 - **Role:** Orchestrates Repositories, Validates Zod Schemas, Handles Errors.
+
+## Next.js Best Practices
+
+We follow a modern "Server Data Provider" architecture for maximum performance and clean separation of concerns.
+
+### 1. Server Data Provider Architecture
+
+Do NOT fetch initial page data on the client (Waterfall Fetching).
+
+- **Pattern:**
+  - **Page (`page.tsx`)**: Is a `async` Server Component. It fetches ALL initial data (DB, Auth) in parallel.
+  - **Component (`*.tsx`)**: Is a Client Component (`"use client"`). It receives data as PROPS (`initialData`).
+
+**✅ Good (Server Provider):**
+
+```tsx
+// page.tsx (Server Component)
+export default async function Page() {
+  const data = await MyService.getData(); // Fast DB access
+  return <ClientComponent initialData={data} />;
+}
+
+// component.tsx (Client Component)
+("use client");
+export function ClientComponent({ initialData }) {
+  const [data, setData] = useState(initialData);
+  // ... interactive logic
+}
+```
+
+**❌ Bad (Client Waterfall):**
+
+```tsx
+// page.tsx ("use client")
+export default function Page() {
+  const [data, setData] = useState(null);
+  useEffect(() => {
+    fetchData().then(setData); // 🐢 Slow + Flash of Loading
+  }, []);
+  if (!data) return <Spinner />;
+}
+```
+
+### 2. State Management
+
+- **URL State:** RESTORE state from URL `searchParams` whenever possible (e.g., Active Tab, Search Query, Conversation ID). This makes links shareable.
+- **Server State:** Use `useOptimistic` or manual optimistic updates for instant feedback while Server Actions run.
+- **Global Stores:** Avoid Redux/Zustand unless absolutely necessary for complex shared UI state (like a global audio player).
+
+### 3. Next.js 16 Compatibility (Mandatory)
+
+Next.js 16 **bans** synchronous access to request-time APIs. You MUST await them.
+
+- `params` & `searchParams` (in Pages/Layouts)
+- `headers()` & `cookies()` (in Server Components/Actions)
+
+```tsx
+// ❌ Runtime Error in Next.js 16
+const id = props.searchParams.id;
+
+// ✅ Correct
+const params = await props.searchParams;
+const id = params.id;
+```
