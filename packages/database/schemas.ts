@@ -36,3 +36,19 @@ export const InsertMembershipSchema = createInsertSchema(schema.memberships);
 // Submissions (critical for document processing)
 export const SelectSubmissionSchema = createSelectSchema(schema.submissions);
 export const InsertSubmissionSchema = createInsertSchema(schema.submissions);
+
+// Agent Conversations
+export const SelectAgentConversationSchema = createSelectSchema(
+  schema.agentConversations
+);
+export const InsertAgentConversationSchema = createInsertSchema(
+  schema.agentConversations
+);
+
+// Agent Messages
+export const SelectAgentMessageSchema = createSelectSchema(
+  schema.agentMessages
+);
+export const InsertAgentMessageSchema = createInsertSchema(
+  schema.agentMessages
+);

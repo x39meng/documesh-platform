@@ -10,7 +10,7 @@
     "db:reset": "dotenv -e ../../apps/web/.env -- bun scripts/reset-db.ts",
     "db:seed": "dotenv -e ../../apps/web/.env -- bun scripts/seed-security.ts",
     "db:seed-user": "dotenv -e ../../apps/web/.env -- bun scripts/seed-user.ts",
-    "lint": "eslint . --ext .ts"
+    "lint": "tsc --noEmit && eslint . --ext .ts"
   },
   "dependencies": {
     "@repo/config": "workspace:*",

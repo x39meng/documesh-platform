@@ -28,3 +28,15 @@ export type NewMembership = InferInsertModel<typeof schema.memberships>;
 // Submissions
 export type Submission = InferSelectModel<typeof schema.submissions>;
 export type NewSubmission = InferInsertModel<typeof schema.submissions>;
+
+// Agent Conversations
+export type AgentConversation = InferSelectModel<
+  typeof schema.agentConversations
+>;
+export type NewAgentConversation = InferInsertModel<
+  typeof schema.agentConversations
+>;
+
+// Agent Messages
+export type AgentMessage = InferSelectModel<typeof schema.agentMessages>;
+export type NewAgentMessage = InferInsertModel<typeof schema.agentMessages>;
