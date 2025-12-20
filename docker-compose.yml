@@ -23,9 +23,12 @@ services:
     environment:
       - SERVICES=s3
       - DEBUG=${DEBUG:-0}
+      - PERSISTENCE=1
     volumes:
       - "./infrastructure/localstack:/etc/localstack/init/ready.d"
       - "/var/run/docker.sock:/var/run/docker.sock"
+      - "localstack_data:/var/lib/localstack"
 
 volumes:
   postgres_data:
+  localstack_data:
